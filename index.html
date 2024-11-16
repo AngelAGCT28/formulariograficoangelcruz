@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Ventas y Gráfico</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* Estilo global */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7fc;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Contenedor principal */
+        .container {
+            width: 80%;
+            max-width: 1000px;
+            margin: 20px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            max-height: 90vh; /* Limita la altura máxima */
+            box-sizing: border-box;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-top: 40px;
+        }
+
+        /* Estilo del formulario */
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        label {
+            font-size: 16px;
+            color: #333;
+        }
+
+        input {
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            border-color: #66afe9;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #66afe9;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #558cc1;
+        }
+
+        /* Estilo del gráfico */
+        #salesChart {
+            margin-top: 40px;
+            max-width: 100%;
+            height: 400px; /* Establecemos una altura fija para el gráfico */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Formulario de Ventas y Gráfico</h1>
+
+        <!-- Formulario de ventas -->
+        <form id="salesForm">
+            <label for="month">Mes:</label>
+            <input type="text" id="month" name="month" required placeholder="Ej. Enero">
+
+            <label for="sales">Ventas:</label>
+            <input type="number" id="sales" name="sales" required placeholder="Ej. 1000">
+
+            <button type="submit">Agregar Venta</button>
+        </form>
+
+        <h2>Gráfico de Ventas por Mes</h2>
+        <canvas id="salesChart"></canvas>
+    </div>
+
+    <script>
+        // Inicializamos los datos del gráfico
+        let months = [];
+        let salesData = [];
+        let colors = [];  // Arreglo para los colores de las barras
+
+        // Función para generar colores aleatorios
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        // Obtención del formulario y el canvas para el gráfico
+        const form = document.getElementById('salesForm');
+        const ctx = document.getElementById('salesChart').getContext('2d');
+
+        // Configuración inicial del gráfico
+        let salesChart = new Chart(ctx, {
+            type: 'bar', // Tipo de gráfico: 'bar' para barras, puede ser 'line' para líneas, etc.
+            data: {
+                labels: months, // Etiquetas del gráfico (Meses)
+                datasets: [{
+                    label: 'Ventas por Mes', // Título del dataset
+                    data: salesData, // Datos de las ventas
+                    backgroundColor: colors, // Colores de las barras
+                    borderColor: colors, // Color del borde
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true // Asegura que el gráfico comience desde 0 en el eje Y
+                    }
+                }
+            }
+        });
+
+        // Evento para capturar los datos del formulario y actualizar el gráfico
+        form.addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevenir el envío del formulario y recarga de página
+
+            // Obtener los valores del formulario
+            const month = document.getElementById('month').value;
+            const sales = document.getElementById('sales').value;
+
+            // Agregar los nuevos datos a los arrays
+            months.push(month);
+            salesData.push(parseInt(sales));
+            colors.push(getRandomColor());  // Asignar un color aleatorio a la nueva barra
+
+            // Actualizar el gráfico con los nuevos datos
+            salesChart.update();
+
+            // Limpiar el formulario después de agregar los datos
+            form.reset();
+        });
+    </script>
+
+</body>
+</html>
